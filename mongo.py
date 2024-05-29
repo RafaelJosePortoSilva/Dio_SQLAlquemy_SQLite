@@ -1,8 +1,8 @@
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-
-
+from faker import Faker
+from random import randint
 def conecta_cliente(passwd):
 
     uri = f"mongodb+srv://rafaelportodev:{passwd}@cluster0.rj4ytcw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -20,7 +20,7 @@ def conecta_cliente(passwd):
         return client
 
 
-def cliente(str: nome, str:cpf, str:endereco, list:contas):
+def cliente(nome:str,cpf:str,endereco:str,contas:list):
     post = {
         'nome':nome,
         'cpf':cpf,
@@ -29,7 +29,7 @@ def cliente(str: nome, str:cpf, str:endereco, list:contas):
     }
     return post
 
-def conta(str:tipo, str:agencia, int:numero, int:saldo=0):
+def conta(tipo:str,agencia:str,numero:int,saldo:float=0):
     post = {
         'tipo':tipo,
         'agencia':agencia,
@@ -38,6 +38,12 @@ def conta(str:tipo, str:agencia, int:numero, int:saldo=0):
     }
     return post
 
+def gerar_cpf():
+    cpf = ''.join([str(randint(0,9)) for _ in range(11)])
+    return cpf
+
+
+
 passwd = input('Senha: \n')
 
 client = conecta_cliente(passwd)
@@ -45,4 +51,22 @@ client = conecta_cliente(passwd)
 db = client.dio
 collection = db.bank
 
-print(collection)
+print(collection + '-'*20 + '\n')
+
+fake = Faker('pt_BR')
+for _ in range(2):
+    post = cliente(
+        nome=fake.name(),
+        cpf=gerar_cpf(),
+        endereco=fake.address(),
+        contas=[conta(
+            tipo='corrente',
+            agencia=''.join([str(randint(0,9)) for _ in range(4)]),
+            numero=randint(0,99)
+        ) for _ in range(2)]
+    )
+    collection.insert_one(post)
+
+
+
+
