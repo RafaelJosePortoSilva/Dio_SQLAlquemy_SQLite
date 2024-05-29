@@ -103,6 +103,6 @@ inspector = inspect(engine)
 print(f'Todas as tabelas:\n{inspector.get_table_names()}')
 
 stmt = select(Cliente)
-print(f'\nTodos os dados em Cliente: \n')
+print(f'\nTodos os dados na tabela Cliente: \n')
 for cli in session.scalars(stmt):
     print(cli)
