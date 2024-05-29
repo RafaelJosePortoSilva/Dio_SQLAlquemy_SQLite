@@ -18,9 +18,17 @@ def cria_tabelas():
 
         conta = relationship(
             'conta',
-            back_populates='cliente',
+            back_population='cliente',
             cascade = 'all, delete-orphan'
         )
+
+        def __repr__(self):
+            return f"""
+            ID: {self._id}
+            Nome: {self.nome}
+            CPF: {self.cpf}
+            Endereço: {self.endereco}
+            """
 
 
     class Conta(Base):
@@ -32,6 +40,22 @@ def cria_tabelas():
         numero = Column(Integer,nullable=False)
         id_cliente = Column(ForeignKey('cliente._id'),nullable=False)
         saldo = Column(Float,default=0)
+
+        cliente = relationship(
+            'cliente',
+            back_population='Conta'
+        )
+
+        def __repr__(self):
+            return f"""
+            ID: {self._id}
+            Tipo: {self.tipo}
+            Agencia: {self.agencia}
+            Numero: {self.numero}
+            ID_Cliente: {self.id_cliente}
+            Saldo: {self.saldo}
+            
+            """
 
 
 def exemplo_popular_tabelas():
