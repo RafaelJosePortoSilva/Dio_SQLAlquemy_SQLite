@@ -5,6 +5,8 @@ from sqlalchemy import Integer, Float, String, ForeignKey
 from sqlalchemy import Column
 from sqlalchemy import create_engine 
 from sqlalchemy import inspect
+from sqlalchemy.sql import select
+
 
 from faker import Faker
 from random import randint
@@ -99,3 +101,8 @@ with Session(engine) as session:
 
 inspector = inspect(engine)
 print(f'Todas as tabelas:\n{inspector.get_table_names()}')
+
+stmt = select(Cliente)
+print(f'\nTodos os dados em Cliente: \n')
+for cli in session.scalars(stmt):
+    print(cli)
