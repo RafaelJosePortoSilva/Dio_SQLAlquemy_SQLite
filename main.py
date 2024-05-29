@@ -1,66 +1,89 @@
-from sqlalchemy.ext.delcarative import declarative_base
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Session
 from sqlalchemy import Integer, Float, String, ForeignKey
 from sqlalchemy import Column
-from sqlalchemy.orm import relationship
+from sqlalchemy import create_engine 
+from sqlalchemy import inspect
+
+from faker import Faker
 
 
-def cria_tabelas():
-    Base = declarative_base()
+
+# Instanciando base para o banco
+Base = declarative_base()
+
+# Criando Tabelas
+
+class Cliente(Base):
+    __tablename__ = 'cliente'
+
+    _id = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String(50),nullable=False)
+    cpf = Column(String(11),nullable=False)
+    endereco = Column(String(50),nullable=True)
+
+    conta = relationship(
+        'conta',
+        back_populates='cliente',
+        cascade = 'all, delete-orphan'
+    )
+
+    def __repr__(self):
+        return f"""
+        ID: {self._id}
+        Nome: {self.nome}
+        CPF: {self.cpf}
+        Endereço: {self.endereco}
+        """
 
 
-    class Cliente(Base):
-        __tablename__ = 'cliente'
+class Conta(Base):
+    __tablename__ = 'conta'
 
-        _id = Column(Integer, primary_key=True, autoincrement=True)
-        nome = Column(String(50),nullable=False)
-        cpf = Column(String(11),nullable=False)
-        endereco = Column(String(50),nullable=True)
+    _id = Column(Integer, primary_key=True, autoincrement=True)
+    tipo = Column(String,nullable=False)
+    agencia = Column(String,nullable=False)
+    numero = Column(Integer,nullable=False)
+    id_cliente = Column(ForeignKey('cliente._id'),nullable=False)
+    saldo = Column(Float,default=0)
 
-        conta = relationship(
-            'conta',
-            back_population='cliente',
-            cascade = 'all, delete-orphan'
+    cliente = relationship(
+        'cliente',
+        back_populates='Conta'
+    )
+
+    def __repr__(self):
+        return f"""
+        ID: {self._id}
+        Tipo: {self.tipo}
+        Agencia: {self.agencia}
+        Numero: {self.numero}
+        ID_Cliente: {self.id_cliente}
+        Saldo: {self.saldo}
+        """
+
+
+
+# Instanciando conexão com sqlite 
+engine = create_engine('sqlite://')
+# Passando as classes para serem criadas no banco
+Base.metadata.create_all(engine)
+
+
+fk = Faker('pt_BR')
+
+with Session(engine) as session:
+    for _ in range(10):
+        cliente = Cliente(
+
         )
 
-        def __repr__(self):
-            return f"""
-            ID: {self._id}
-            Nome: {self.nome}
-            CPF: {self.cpf}
-            Endereço: {self.endereco}
-            """
 
 
-    class Conta(Base):
-        __tablename__ = 'conta'
-
-        _id = Column(Integer, primary_key=True, autoincrement=True)
-        tipo = Column(String,nullable=False)
-        agencia = Column(String,nullable=False)
-        numero = Column(Integer,nullable=False)
-        id_cliente = Column(ForeignKey('cliente._id'),nullable=False)
-        saldo = Column(Float,default=0)
-
-        cliente = relationship(
-            'cliente',
-            back_population='Conta'
-        )
-
-        def __repr__(self):
-            return f"""
-            ID: {self._id}
-            Tipo: {self.tipo}
-            Agencia: {self.agencia}
-            Numero: {self.numero}
-            ID_Cliente: {self.id_cliente}
-            Saldo: {self.saldo}
-            
-            """
 
 
-def exemplo_popular_tabelas():
-    ...
 
 
-def exemplo_consultar_tabelas():
-    ...
+inspector = inspect(engine)
+print(f'Todas as tabelas:\n{inspector.get_table_names()}')
