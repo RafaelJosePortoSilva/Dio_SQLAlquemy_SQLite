@@ -10,7 +10,8 @@ from faker import Faker
 from random import randint
 
 def gerar_cpf():
-    cpf = ''.join([randint(0,9) for _ in range(11)])
+    cpf = ''.join([str(randint(0,9)) for _ in range(11)])
+    return cpf
 
 # Instanciando base para o banco
 Base = declarative_base()
@@ -26,7 +27,7 @@ class Cliente(Base):
     endereco = Column(String(50),nullable=True)
 
     conta = relationship(
-        'conta',
+        'Conta',
         back_populates='cliente',
         cascade = 'all, delete-orphan'
     )
@@ -51,8 +52,8 @@ class Conta(Base):
     saldo = Column(Float,default=0)
 
     cliente = relationship(
-        'cliente',
-        back_populates='Conta'
+        'Cliente',
+        back_populates='conta'
     )
 
     def __repr__(self):
@@ -78,10 +79,16 @@ faker = Faker('pt_BR')
 with Session(engine) as session:
     clientes = list()
     for _ in range(10):
-        clientes.append( = Cliente(
+        clientes.append(Cliente(
             nome = faker.name(),
             cpf = gerar_cpf(),
-            endereco = faker.address()
+            endereco = faker.address(),
+            conta = [
+                Conta(
+                    tipo = 'corrente',
+                    agencia = ''.join([str(randint(0,9)) for _ in range(4)]),
+                    numero = randint(0,99)
+                ) for _ in range(2)]
         ))
     
     # Enviando para o SGBD
