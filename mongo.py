@@ -3,6 +3,10 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from faker import Faker
 from random import randint
+import pprint
+
+
+
 def conecta_cliente(passwd):
 
     uri = f"mongodb+srv://rafaelportodev:{passwd}@cluster0.rj4ytcw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -51,7 +55,7 @@ client = conecta_cliente(passwd)
 db = client.dio
 collection = db.bank
 
-print(collection + '-'*20 + '\n')
+print(f"{collection}\n{'-'*60}\n")
 
 fake = Faker('pt_BR')
 for _ in range(2):
@@ -67,6 +71,8 @@ for _ in range(2):
     )
     collection.insert_one(post)
 
-
+all_data = collection.find({})
+for data in all_data:
+    pprint.pprint(data)
 
 
