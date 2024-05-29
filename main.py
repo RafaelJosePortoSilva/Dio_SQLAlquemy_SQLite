@@ -7,8 +7,10 @@ from sqlalchemy import create_engine
 from sqlalchemy import inspect
 
 from faker import Faker
+from random import randint
 
-
+def gerar_cpf():
+    cpf = ''.join([randint(0,9) for _ in range(11)])
 
 # Instanciando base para o banco
 Base = declarative_base()
@@ -71,17 +73,20 @@ engine = create_engine('sqlite://')
 Base.metadata.create_all(engine)
 
 
-fk = Faker('pt_BR')
+faker = Faker('pt_BR')
 
 with Session(engine) as session:
+    clientes = list()
     for _ in range(10):
-        cliente = Cliente(
-
-        )
-
-
-
-
+        clientes.append( = Cliente(
+            nome = faker.name(),
+            cpf = gerar_cpf(),
+            endereco = faker.address()
+        ))
+    
+    # Enviando para o SGBD
+    session.add_all(clientes)
+    session.commit()
 
 
 
