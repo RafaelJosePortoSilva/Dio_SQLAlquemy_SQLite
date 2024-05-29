@@ -1,7 +1,7 @@
 from sqlalchemy.ext.delcarative import declarative_base
 from sqlalchemy import Integer, Float, String, ForeignKey
 from sqlalchemy import Column
-
+from sqlalchemy.orm import relationship
 
 
 def cria_tabelas():
@@ -16,6 +16,11 @@ def cria_tabelas():
         cpf = Column(String(11),nullable=False)
         endereco = Column(String(50),nullable=True)
 
+        conta = relationship(
+            'conta',
+            back_populates='cliente',
+            cascade = 'all, delete-orphan'
+        )
 
 
     class Conta(Base):
